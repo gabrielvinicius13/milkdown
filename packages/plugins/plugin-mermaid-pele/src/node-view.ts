@@ -1,6 +1,10 @@
 import type { Ctx } from '@milkdown/ctx'
 import type { Node as ProseNode } from '@milkdown/prose/model'
-import type { EditorView, NodeView, ViewMutationRecord } from '@milkdown/prose/view'
+import type {
+  EditorView,
+  NodeView,
+  ViewMutationRecord,
+} from '@milkdown/prose/view'
 import type { RenderOptions } from 'pele'
 
 import { codeBlockAttr } from '@milkdown/preset-commonmark'
@@ -38,7 +42,10 @@ function subscribe(selection: () => void, focus: () => void) {
   }
 }
 
-function assignAttrs(element: HTMLElement, attrs: Record<string, unknown> | undefined) {
+function assignAttrs(
+  element: HTMLElement,
+  attrs: Record<string, unknown> | undefined
+) {
   if (!attrs) return
 
   for (const [key, value] of Object.entries(attrs)) {
@@ -59,7 +66,11 @@ function readDomAttrs(ctx: Ctx, node: ProseNode): CodeBlockDomAttrs {
   return value ?? {}
 }
 
-function cssFont(styles: CSSStyleDeclaration, variable: string, fallback: string) {
+function cssFont(
+  styles: CSSStyleDeclaration,
+  variable: string,
+  fallback: string
+) {
   const value = styles.getPropertyValue(variable).trim()
   if (!value || value.includes('var(')) return fallback
   return value
@@ -108,12 +119,16 @@ export class DefaultCodeBlockView implements NodeView {
   }
 }
 
-/// Diagram preview for a `code_block` whose language is `mermaid`.
+/// Diagram preview for a `code_block` whose language is `mermaid` or `pele`.
 export class MermaidCodeBlockView implements NodeView {
   dom: HTMLElement
   contentDOM: HTMLElement
 
   private node: ProseNode
+  private readonly tools: HTMLElement
+  private readonly languageLabel: HTMLElement
+  private readonly copyButton: HTMLButtonElement
+  private readonly toggleButton: HTMLButtonElement
   private readonly preview: HTMLElement
   private readonly errorEl: HTMLElement
   private readonly source: HTMLElement
@@ -135,11 +150,39 @@ export class MermaidCodeBlockView implements NodeView {
     viewSerial += 1
     this.idPrefix = `milkdown-mermaid-${viewSerial}-`
 
+    const language = String(node.attrs.language ?? 'mermaid')
     const block = document.createElement('div')
     block.className = 'milkdown-mermaid-block'
-    block.dataset.language = 'mermaid'
+    block.dataset.language = language.toLowerCase()
     block.dataset.editing = 'false'
     block.dataset.invalid = 'false'
+
+    this.tools = document.createElement('div')
+    this.tools.className = 'milkdown-mermaid-tools'
+    this.tools.contentEditable = 'false'
+    this.languageLabel = document.createElement('span')
+    this.languageLabel.className = 'milkdown-mermaid-language'
+    this.languageLabel.textContent = language
+    this.copyButton = document.createElement('button')
+    this.copyButton.type = 'button'
+    this.copyButton.className = 'milkdown-mermaid-copy'
+    this.copyButton.textContent = 'Copy code'
+    this.copyButton.addEventListener('mousedown', (event) =>
+      event.stopPropagation()
+    )
+    this.copyButton.addEventListener('click', this.onCopy)
+    this.toggleButton = document.createElement('button')
+    this.toggleButton.type = 'button'
+    this.toggleButton.className = 'milkdown-mermaid-source-toggle'
+    this.toggleButton.textContent = 'Edit code'
+    this.toggleButton.addEventListener('mousedown', (event) =>
+      event.stopPropagation()
+    )
+    this.toggleButton.addEventListener('click', this.onToggleSource)
+    const toolGroup = document.createElement('div')
+    toolGroup.className = 'milkdown-mermaid-tool-group'
+    toolGroup.append(this.copyButton, this.toggleButton)
+    this.tools.append(this.languageLabel, toolGroup)
 
     this.preview = document.createElement('div')
     this.preview.className = 'milkdown-mermaid-preview pele'
@@ -160,13 +203,13 @@ export class MermaidCodeBlockView implements NodeView {
     this.source = document.createElement('pre')
     this.source.className = 'milkdown-mermaid-source'
     assignAttrs(this.source, attrs.pre)
-    this.source.dataset.language = 'mermaid'
+    this.source.dataset.language = language.toLowerCase()
     const code = document.createElement('code')
     assignAttrs(code, attrs.code)
     code.spellcheck = false
     this.source.append(code)
 
-    block.append(this.preview, this.errorEl, this.source)
+    block.append(this.tools, this.preview, this.errorEl, this.source)
     this.dom = block
     this.contentDOM = code
 
@@ -189,6 +232,9 @@ export class MermaidCodeBlockView implements NodeView {
     if (node.type !== this.node.type) return false
     if (!isMermaidLanguage(node.attrs.language)) return false
     this.node = node
+    const language = String(node.attrs.language ?? 'mermaid').toLowerCase()
+    this.dom.dataset.language = language
+    this.source.dataset.language = language
     this.renderDiagram(false)
     this.sync()
     return true
@@ -211,7 +257,11 @@ export class MermaidCodeBlockView implements NodeView {
     const target = event.target
     if (!(target instanceof globalThis.Node)) return false
     if (this.contentDOM.contains(target)) return false
-    return this.preview.contains(target) || this.errorEl.contains(target)
+    return (
+      this.tools.contains(target) ||
+      this.preview.contains(target) ||
+      this.errorEl.contains(target)
+    )
   }
 
   ignoreMutation(record: ViewMutationRecord) {
@@ -221,6 +271,8 @@ export class MermaidCodeBlockView implements NodeView {
   destroy() {
     this.preview.removeEventListener('mousedown', this.onPreviewMouseDown)
     this.preview.removeEventListener('keydown', this.onPreviewKeyDown)
+    this.copyButton.removeEventListener('click', this.onCopy)
+    this.toggleButton.removeEventListener('click', this.onToggleSource)
     this.onResize?.disconnect()
     this.unsubscribe()
   }
@@ -236,6 +288,44 @@ export class MermaidCodeBlockView implements NodeView {
     if (event.key !== 'Enter' && event.key !== ' ') return
     if (this.isSourceVisible()) return
     event.preventDefault()
+    this.edit()
+  }
+
+  private onCopy = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    const text = this.node.textContent
+    const write = navigator.clipboard?.writeText
+    if (write) {
+      void write
+        .call(navigator.clipboard, text)
+        .catch(() => this.copyFallback(text))
+      return
+    }
+    this.copyFallback(text)
+  }
+
+  private copyFallback(text: string) {
+    const area = this.dom.ownerDocument.createElement('textarea')
+    area.value = text
+    area.setAttribute('readonly', '')
+    area.style.position = 'fixed'
+    area.style.left = '-9999px'
+    this.dom.ownerDocument.body.append(area)
+    area.select()
+    this.dom.ownerDocument.execCommand('copy')
+    area.remove()
+  }
+
+  private onToggleSource = (event: MouseEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (this.invalid) return
+    if (this.open) {
+      this.open = false
+      this.sync()
+      return
+    }
     this.edit()
   }
 
@@ -259,7 +349,9 @@ export class MermaidCodeBlockView implements NodeView {
     if (!node) return
     const caret = pos + node.nodeSize - 1
     this.view.dispatch(
-      this.view.state.tr.setSelection(TextSelection.create(this.view.state.doc, caret))
+      this.view.state.tr.setSelection(
+        TextSelection.create(this.view.state.doc, caret)
+      )
     )
     this.open = true
     this.view.focus()
@@ -281,7 +373,11 @@ export class MermaidCodeBlockView implements NodeView {
     const options: RenderOptions = {
       idPrefix: this.idPrefix,
       responsive: true,
-      fontFamily: cssFont(styles, '--pele-font', styles.fontFamily || 'sans-serif'),
+      fontFamily: cssFont(
+        styles,
+        '--pele-font',
+        styles.fontFamily || 'sans-serif'
+      ),
       fontFamilyMono: cssFont(styles, '--pele-font-mono', 'monospace'),
     }
     if (width > 0) options.maxWidth = width
@@ -306,6 +402,11 @@ export class MermaidCodeBlockView implements NodeView {
     const showSource = this.invalid || this.open
     this.dom.dataset.editing = showSource ? 'true' : 'false'
     this.dom.dataset.invalid = this.invalid ? 'true' : 'false'
+    this.languageLabel.textContent = String(
+      this.node.attrs.language ?? 'mermaid'
+    )
+    this.toggleButton.hidden = this.invalid
+    this.toggleButton.textContent = showSource ? 'Hide code' : 'Edit code'
     this.preview.tabIndex = showSource ? -1 : 0
     this.preview.setAttribute('role', showSource ? 'img' : 'button')
     if (showSource) this.preview.removeAttribute('aria-label')

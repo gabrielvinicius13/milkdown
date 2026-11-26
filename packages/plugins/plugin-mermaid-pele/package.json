@@ -2,9 +2,9 @@
   "name": "@milkdown/plugin-mermaid-pele",
   "version": "7.23.0",
   "keywords": [
+    "mermaid",
     "milkdown",
     "milkdown plugin",
-    "mermaid",
     "pele"
   ],
   "license": "MIT",
@@ -43,14 +43,8 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@codemirror/language": "^6.10.1",
     "pele": "^1.13.0"
-  },
-  "peerDependencies": {
-    "@milkdown/core": "^7.23.0",
-    "@milkdown/ctx": "^7.23.0",
-    "@milkdown/preset-commonmark": "^7.23.0",
-    "@milkdown/prose": "^7.23.0",
-    "@milkdown/utils": "^7.23.0"
   },
   "devDependencies": {
     "@milkdown/core": "workspace:*",
@@ -59,5 +53,12 @@
     "@milkdown/preset-commonmark": "workspace:*",
     "@milkdown/prose": "workspace:*",
     "@milkdown/utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "@milkdown/core": "^7.23.0",
+    "@milkdown/ctx": "^7.23.0",
+    "@milkdown/preset-commonmark": "^7.23.0",
+    "@milkdown/prose": "^7.23.0",
+    "@milkdown/utils": "^7.23.0"
   }
 }

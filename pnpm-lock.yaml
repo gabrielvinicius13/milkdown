@@ -888,6 +888,9 @@ importers:
 
   packages/plugins/plugin-mermaid-pele:
     dependencies:
+      '@codemirror/language':
+        specifier: ^6.10.1
+        version: 6.12.4
       pele:
         specifier: ^1.13.0
         version: 1.13.0

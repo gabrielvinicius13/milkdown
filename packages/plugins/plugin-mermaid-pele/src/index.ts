@@ -1,5 +1,10 @@
 import './style.css'
 
+export {
+  mermaidLanguage,
+  peleLanguage,
+  withDiagramLanguages,
+} from './diagram-languages'
 export { isMermaidLanguage } from './language'
 export { mermaidPele, mermaidPeleBehavior, mermaidPeleView } from './plugin'
 export {

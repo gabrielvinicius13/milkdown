@@ -17,7 +17,10 @@ import {
   notifyMermaidFocus,
   notifyMermaidSelection,
 } from './node-view'
-import { withMermaidPreview, type MermaidPreviewRenderer } from './render-preview'
+import {
+  withMermaidPreview,
+  type MermaidPreviewRenderer,
+} from './render-preview'
 
 const CODE_BLOCK_ID = 'code_block'
 const PREVIEW_CONFIG = 'codeBlockConfigCtx'
@@ -59,6 +62,11 @@ function installNodeView(ctx: Ctx) {
       }
       return new DefaultCodeBlockView(node, ctx)
     }
+    // Crepe's code block already draws the copy button, language picker and
+    // preview toggle. Keep that view and render the diagram through renderPreview.
+    if (ctx.isInjected(PREVIEW_CONFIG) && previous) {
+      return previous(node, view, getPos, decorations, innerDecorations)
+    }
     return new MermaidCodeBlockView(node, view, position, ctx)
   }
 
@@ -74,28 +82,36 @@ function installNodeView(ctx: Ctx) {
 }
 
 /// Registers the Mermaid node view after every other code-block view.
-export const mermaidPeleView = addTimer((ctx, plugin, done) => {
-  plugin.meta = {
-    package: '@milkdown/plugin-mermaid-pele',
-    displayName: 'NodeView<mermaid-pele>',
-  }
+export const mermaidPeleView = addTimer(
+  (ctx, plugin, done) => {
+    plugin.meta = {
+      package: '@milkdown/plugin-mermaid-pele',
+      displayName: 'NodeView<mermaid-pele>',
+    }
 
-  const ready = (async () => {
-    await ctx.wait(EditorStateReady)
-    installPreviewConfig(ctx)
-    return installNodeView(ctx)
-  })()
+    const ready = (async () => {
+      await ctx.wait(EditorStateReady)
+      installPreviewConfig(ctx)
+      return installNodeView(ctx)
+    })()
 
-  return ready.finally(() => {
-    done()
-  })
-}, editorViewTimerCtx, 'mermaid-pele-view')
+    return ready.finally(() => {
+      done()
+    })
+  },
+  editorViewTimerCtx,
+  'mermaid-pele-view'
+)
 
 function revealInvalidCrepeBlocks(root: HTMLElement) {
-  for (const block of root.querySelectorAll<HTMLElement>('.milkdown-code-block')) {
+  for (const block of root.querySelectorAll<HTMLElement>(
+    '.milkdown-code-block'
+  )) {
     const invalid = Boolean(block.querySelector('.milkdown-mermaid-error'))
     const host = block.querySelector('.codemirror-host')
-    const toggle = block.querySelector<HTMLButtonElement>('.preview-toggle-button')
+    const toggle = block.querySelector<HTMLButtonElement>(
+      '.preview-toggle-button'
+    )
     if (!host || !toggle) continue
 
     if (!invalid) {
@@ -103,7 +119,10 @@ function revealInvalidCrepeBlocks(root: HTMLElement) {
       continue
     }
 
-    if (host.classList.contains('hidden') && block.dataset.mermaidRevealed !== '1') {
+    if (
+      host.classList.contains('hidden') &&
+      block.dataset.mermaidRevealed !== '1'
+    ) {
       block.dataset.mermaidRevealed = '1'
       toggle.click()
     }
@@ -111,7 +130,9 @@ function revealInvalidCrepeBlocks(root: HTMLElement) {
 }
 
 function hideCrepeSource(root: HTMLElement) {
-  for (const block of root.querySelectorAll<HTMLElement>('.milkdown-code-block')) {
+  for (const block of root.querySelectorAll<HTMLElement>(
+    '.milkdown-code-block'
+  )) {
     if (!block.querySelector('.milkdown-mermaid-preview')) continue
     if (block.querySelector('.milkdown-mermaid-error')) continue
     const host = block.querySelector('.codemirror-host')
@@ -120,7 +141,7 @@ function hideCrepeSource(root: HTMLElement) {
   }
 }
 
-/// Selection, focus, and Crepe preview interactions for Mermaid blocks.
+/// Selection, focus, and Crepe preview interactions for diagram blocks.
 export const mermaidPeleBehavior = $prose(
   () =>
     new Plugin({
@@ -138,7 +159,9 @@ export const mermaidPeleBehavior = $prose(
             const host = block.querySelector('.codemirror-host')
             if (!host?.classList.contains('hidden')) return false
             event.preventDefault()
-            block.querySelector<HTMLButtonElement>('.preview-toggle-button')?.click()
+            block
+              .querySelector<HTMLButtonElement>('.preview-toggle-button')
+              ?.click()
             return true
           },
         },
@@ -178,4 +201,7 @@ mermaidPeleBehavior.meta = {
 }
 
 /// Mermaid diagrams for Milkdown code blocks, rendered synchronously by Pele.
-export const mermaidPele: MilkdownPlugin[] = [mermaidPeleView, mermaidPeleBehavior]
+export const mermaidPele: MilkdownPlugin[] = [
+  mermaidPeleView,
+  mermaidPeleBehavior,
+]
