@@ -886,6 +886,31 @@ importers:
         specifier: ^4.17.21
         version: 4.18.1
 
+  packages/plugins/plugin-mermaid-pele:
+    dependencies:
+      pele:
+        specifier: ^1.13.0
+        version: 1.13.0
+    devDependencies:
+      '@milkdown/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@milkdown/ctx':
+        specifier: workspace:*
+        version: link:../../ctx
+      '@milkdown/plugin-prism':
+        specifier: workspace:*
+        version: link:../plugin-prism
+      '@milkdown/preset-commonmark':
+        specifier: workspace:*
+        version: link:../preset-commonmark
+      '@milkdown/prose':
+        specifier: workspace:*
+        version: link:../../prose
+      '@milkdown/utils':
+        specifier: workspace:*
+        version: link:../../utils
+
   packages/plugins/plugin-prism:
     dependencies:
       '@milkdown/ctx':
@@ -4854,6 +4879,10 @@ packages:
   pathval@2.0.1:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
     engines: {node: '>= 14.16'}
+
+  pele@1.13.0:
+    resolution: {integrity: sha512-Ie8UKY9x00MsuR3jO6AzUwzK2Z6MIV3Tf4EDdITiuk8Uaz8K7g0R082WqsqNaSU8DdgkrRvZThzhit83mi/uiw==}
+    engines: {node: '>=20'}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -9445,6 +9474,8 @@ snapshots:
   pathe@2.0.3: {}
 
   pathval@2.0.1: {}
+
+  pele@1.13.0: {}
 
   picocolors@1.1.1: {}
 

@@ -1,0 +1,63 @@
+{
+  "name": "@milkdown/plugin-mermaid-pele",
+  "version": "7.23.0",
+  "keywords": [
+    "milkdown",
+    "milkdown plugin",
+    "mermaid",
+    "pele"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Milkdown/milkdown.git",
+    "directory": "packages/plugins/plugin-mermaid-pele"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    },
+    "./style.css": "./src/style.css"
+  },
+  "publishConfig": {
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./lib/index.js",
+        "types": "./lib/index.d.ts"
+      },
+      "./style.css": "./lib/style.css"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "pele": "^1.13.0"
+  },
+  "peerDependencies": {
+    "@milkdown/core": "^7.23.0",
+    "@milkdown/ctx": "^7.23.0",
+    "@milkdown/preset-commonmark": "^7.23.0",
+    "@milkdown/prose": "^7.23.0",
+    "@milkdown/utils": "^7.23.0"
+  },
+  "devDependencies": {
+    "@milkdown/core": "workspace:*",
+    "@milkdown/ctx": "workspace:*",
+    "@milkdown/plugin-prism": "workspace:*",
+    "@milkdown/preset-commonmark": "workspace:*",
+    "@milkdown/prose": "workspace:*",
+    "@milkdown/utils": "workspace:*"
+  }
+}

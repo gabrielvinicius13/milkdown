@@ -24,6 +24,7 @@
     { "path": "./packages/plugins/plugin-history" },
     { "path": "./packages/plugins/plugin-indent" },
     { "path": "./packages/plugins/plugin-listener" },
+    { "path": "./packages/plugins/plugin-mermaid-pele" },
     { "path": "./packages/plugins/plugin-prism" },
     { "path": "./packages/plugins/plugin-slash" },
     { "path": "./packages/plugins/plugin-streaming" },

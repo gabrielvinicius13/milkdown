@@ -1,0 +1,155 @@
+.milkdown-mermaid-preview.pele {
+  --pele-bg: var(
+    --crepe-color-background,
+    var(--vscode-editor-background, #ffffff)
+  );
+  --pele-fg: var(
+    --crepe-color-on-background,
+    var(--vscode-editor-foreground, #1f1f1f)
+  );
+  --pele-fg-on-light: #1f1f1f;
+  --pele-fg-on-dark: #ffffff;
+  --pele-muted: var(
+    --vscode-descriptionForeground,
+    color-mix(in srgb, var(--pele-fg) 62%, var(--pele-bg))
+  );
+  --pele-line: var(--pele-fg);
+  --pele-surface: var(
+    --crepe-color-surface,
+    var(--vscode-editorWidget-background, var(--vscode-panel-background, #f3f3f3))
+  );
+  --pele-surface-alt: var(
+    --crepe-color-surface-low,
+    var(--vscode-editorGroupHeader-tabsBackground, #e6e6e6)
+  );
+  --pele-border: var(
+    --crepe-color-outline,
+    var(--vscode-panel-border, var(--vscode-widget-border, #8a8a8a))
+  );
+  --pele-accent: var(
+    --crepe-color-primary,
+    var(--vscode-textLink-foreground, var(--vscode-focusBorder, #5b7bd5))
+  );
+  --pele-critical: var(
+    --crepe-color-error,
+    var(--vscode-editorError-foreground, #e45756)
+  );
+  --pele-error: var(--pele-critical);
+  --pele-font: var(
+    --crepe-font-default,
+    var(--vscode-font-family, var(--vscode-editor-font-family, sans-serif))
+  );
+  --pele-font-mono: var(
+    --crepe-font-code,
+    var(--vscode-editor-font-family, ui-monospace, monospace)
+  );
+  --pele-title-weight: 700;
+  --pele-heading-weight: 700;
+  --pele-bold-weight: 700;
+  --pele-radius: 4px;
+  --pele-series-1: var(--vscode-charts-blue, #4c78a8);
+  --pele-series-2: var(--vscode-charts-orange, #f58518);
+  --pele-series-3: var(--vscode-charts-green, #54a24b);
+  --pele-series-4: var(--vscode-charts-red, #e45756);
+  --pele-series-5: var(--vscode-charts-purple, #b279a2);
+  --pele-series-6: var(--vscode-charts-yellow, #eeca3b);
+  --pele-series-7: var(--vscode-charts-foreground, #72b7b2);
+  --pele-series-8: var(--vscode-charts-lines, #9d755d);
+  background: var(--pele-bg);
+  color: var(--pele-fg);
+  font-family: var(--pele-font);
+}
+
+.vscode-dark .milkdown-mermaid-preview.pele {
+  --pele-bg: var(--vscode-editor-background, var(--crepe-color-background, #1e1e1e));
+  --pele-fg: var(--vscode-editor-foreground, var(--crepe-color-on-background, #d4d4d4));
+  --pele-surface: var(--vscode-editorWidget-background, #252526);
+  --pele-surface-alt: var(--vscode-editorGroupHeader-tabsBackground, #2d2d2d);
+  --pele-border: var(--vscode-panel-border, var(--vscode-widget-border, #3c3c3c));
+  --pele-line: var(--pele-fg);
+  --pele-muted: var(--vscode-descriptionForeground, #9d9d9d);
+}
+
+.vscode-high-contrast .milkdown-mermaid-preview.pele,
+.vscode-high-contrast-light .milkdown-mermaid-preview.pele {
+  --pele-bg: var(--vscode-editor-background, Canvas);
+  --pele-fg: var(--vscode-editor-foreground, CanvasText);
+  --pele-line: var(--vscode-editor-foreground, CanvasText);
+  --pele-muted: var(--vscode-descriptionForeground, CanvasText);
+  --pele-surface: var(--vscode-editor-background, Canvas);
+  --pele-surface-alt: var(--vscode-editor-inactiveSelectionBackground, Canvas);
+  --pele-border: var(--vscode-contrastBorder, CanvasText);
+  --pele-accent: var(--vscode-textLink-foreground, LinkText);
+  --pele-critical: var(--vscode-editorError-foreground, CanvasText);
+  --pele-error: var(--pele-critical);
+}
+
+.milkdown-mermaid-block {
+  margin: 0.75rem 0;
+  overflow: hidden;
+  border: 1px solid var(--pele-border, var(--crepe-color-outline, #8a8a8a));
+  border-radius: var(--pele-radius, 4px);
+  background: var(--pele-bg, transparent);
+}
+
+.milkdown-mermaid-preview.pele {
+  padding: 12px;
+  overflow-x: auto;
+  cursor: pointer;
+}
+
+.milkdown-mermaid-block[data-editing='true'] > .milkdown-mermaid-preview.pele {
+  cursor: default;
+  border-bottom: 1px solid var(--pele-border, transparent);
+}
+
+.milkdown-mermaid-preview.pele:focus-visible {
+  outline: 2px solid var(--pele-accent);
+  outline-offset: -2px;
+}
+
+.milkdown-mermaid-preview.pele svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.milkdown-mermaid-block > pre.milkdown-mermaid-source {
+  margin: 0;
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: var(
+    --vscode-textCodeBlock-background,
+    var(--crepe-color-surface, transparent)
+  );
+  color: var(--vscode-editor-foreground, inherit);
+  font-family: var(--pele-font-mono, ui-monospace, monospace);
+  font-size: 0.92em;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.milkdown-mermaid-block[data-editing='false'][data-invalid='false']
+  > pre.milkdown-mermaid-source {
+  display: none;
+}
+
+.milkdown-mermaid-error {
+  margin: 0;
+  padding: 8px 12px;
+  color: var(--pele-error, #e45756);
+  background: var(--vscode-inputValidation-errorBackground, transparent);
+  border-top: 1px solid var(--vscode-inputValidation-errorBorder, transparent);
+  font-family: var(--pele-font-mono, ui-monospace, monospace);
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.milkdown-mermaid-error[hidden] {
+  display: none;
+}
+
+.milkdown-code-block .preview .milkdown-mermaid-preview.pele {
+  cursor: pointer;
+}
